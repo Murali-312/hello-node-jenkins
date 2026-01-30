@@ -23,8 +23,8 @@ pipeline {
                 echo "📦 Packaging application"
                 rm -f ${APP_NAME}.zip
                 zip -r ${APP_NAME}.zip . \
-                    -x ".git/*" \
-                    -x "node_modules/*"
+                  -x ".git/*" \
+                  -x "node_modules/*"
                 '''
             }
         }
@@ -42,7 +42,7 @@ pipeline {
         stage('Deploy & Run on Remote Server') {
             steps {
                 sh """
-                ssh ${REMOTE_USER}@${REMOTE_HOST} << EOF
+                ssh ${REMOTE_USER}@${REMOTE_HOST} '
                 set -e
 
                 echo "📦 Deploying ${APP_NAME}"
@@ -51,9 +51,9 @@ pipeline {
                 unzip -o ~/${APP_NAME}.zip -d ${DEPLOY_DIR}/${APP_NAME}
                 cd ${DEPLOY_DIR}/${APP_NAME}
 
-                # ---- Load NVM (non-interactive shell fix) ----
-                export NVM_DIR="\\\$HOME/.nvm"
-                [ -s "\\\$NVM_DIR/nvm.sh" ] && . "\\\$NVM_DIR/nvm.sh"
+                # ---- Load NVM for non-interactive shell ----
+                export NVM_DIR="\$HOME/.nvm"
+                [ -s "\$NVM_DIR/nvm.sh" ] && . "\$NVM_DIR/nvm.sh"
 
                 echo "🧪 Node version:"
                 node -v
@@ -67,7 +67,7 @@ pipeline {
                 pm2 save
 
                 echo "✅ Deployment completed successfully"
-                EOF
+                '
                 """
             }
         }
