@@ -20,6 +20,7 @@ pipeline {
         stage('Package Application') {
             steps {
                 sh '''
+                echo "📦 Packaging application"
                 rm -f ${APP_NAME}.zip
                 zip -r ${APP_NAME}.zip . \
                     -x ".git/*" \
@@ -31,6 +32,7 @@ pipeline {
         stage('Copy Artifact to Remote Server') {
             steps {
                 sh '''
+                echo "🚚 Copying artifact to remote server"
                 scp ${APP_NAME}.zip \
                 ${REMOTE_USER}@${REMOTE_HOST}:~/${APP_NAME}.zip
                 '''
@@ -39,8 +41,8 @@ pipeline {
 
         stage('Deploy & Run on Remote Server') {
             steps {
-                sh '''
-                ssh ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
+                sh """
+                ssh ${REMOTE_USER}@${REMOTE_HOST} << EOF
                 set -e
 
                 echo "📦 Deploying ${APP_NAME}"
@@ -49,9 +51,9 @@ pipeline {
                 unzip -o ~/${APP_NAME}.zip -d ${DEPLOY_DIR}/${APP_NAME}
                 cd ${DEPLOY_DIR}/${APP_NAME}
 
-                # ---- Load NVM explicitly ----
-                export NVM_DIR="$HOME/.nvm"
-                [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+                # ---- Load NVM (non-interactive shell fix) ----
+                export NVM_DIR="\\\$HOME/.nvm"
+                [ -s "\\\$NVM_DIR/nvm.sh" ] && . "\\\$NVM_DIR/nvm.sh"
 
                 echo "🧪 Node version:"
                 node -v
@@ -64,9 +66,9 @@ pipeline {
                 pm2 start app.js --name ${APP_NAME}
                 pm2 save
 
-                echo "✅ Deployment completed"
+                echo "✅ Deployment completed successfully"
                 EOF
-                '''
+                """
             }
         }
     }
