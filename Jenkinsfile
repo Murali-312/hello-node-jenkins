@@ -67,18 +67,14 @@ cd ${DEPLOY_DIR}
 
 node -v
 npm -v
-
 npm install --omit=dev
 
 pm2 delete ${APP_NAME} || true
 pm2 start app.js --name ${APP_NAME}
 pm2 save
-
-echo "✅ Deployment completed successfully"
 EOF
                 """
             }
         }
     }
 }
-
