@@ -48,16 +48,26 @@ pipeline {
         }
 
         /* =========================
-           SNYK SECURITY SCAN (NEW)
+           SNYK SECURITY SCAN
            ========================= */
         stage('Snyk Security Scan') {
             environment {
                 SNYK_TOKEN = credentials('snyk-token')
             }
             steps {
-                sh '''
-                  snyk test --severity-threshold=high
-                '''
+                sh 'snyk test --severity-threshold=high'
+            }
+        }
+
+        /* =========================
+           SNYK MONITOR (REPORTING)
+           ========================= */
+        stage('Snyk Monitor') {
+            environment {
+                SNYK_TOKEN = credentials('snyk-token')
+            }
+            steps {
+                sh 'snyk monitor'
             }
         }
 
