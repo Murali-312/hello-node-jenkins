@@ -12,16 +12,21 @@ pipeline {
     stages {
 
         stage('Clean Workspace') {
-    steps {
-        cleanWs()
-    }
-}
-
+            steps {
+                cleanWs()
+            }
+        }
 
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/Murali-312/hello-node-jenkins.git'
+            }
+        }
+
+        stage('Install Dependencies (CI)') {
+            steps {
+                sh 'npm install'
             }
         }
 
@@ -39,6 +44,20 @@ pipeline {
                         """
                     }
                 }
+            }
+        }
+
+        /* =========================
+           SNYK SECURITY SCAN (NEW)
+           ========================= */
+        stage('Snyk Security Scan') {
+            environment {
+                SNYK_TOKEN = credentials('snyk-token')
+            }
+            steps {
+                sh '''
+                  snyk test --severity-threshold=high
+                '''
             }
         }
 
@@ -85,3 +104,4 @@ EOF
         }
     }
 }
+
