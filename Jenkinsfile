@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        sonarQubeScanner 'SonarScanner'
-    }
-
     environment {
         REMOTE_USER = "murali"
         REMOTE_HOST = "192.168.1.118"
@@ -25,13 +21,16 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh """
-                      sonar-scanner \
-                        -Dsonar.projectKey=hello-node-jenkins \
-                        -Dsonar.projectName=hello-node-jenkins \
-                        -Dsonar.sources=. \
-                        -Dsonar.exclusions=node_modules/**,.git/**
-                    """
+                    script {
+                        def scannerHome = tool 'SonarScanner'
+                        sh """
+                          ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=hello-node-jenkins \
+                            -Dsonar.projectName=hello-node-jenkins \
+                            -Dsonar.sources=. \
+                            -Dsonar.exclusions=node_modules/**,.git/**
+                        """
+                    }
                 }
             }
         }
