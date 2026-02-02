@@ -18,6 +18,22 @@ pipeline {
             }
         }
 
+        /* 🔍 NEW STAGE — SONARQUBE ANALYSIS */
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                      sonar-scanner \
+                        -Dsonar.projectKey=hello-node-jenkins \
+                        -Dsonar.projectName=hello-node-jenkins \
+                        -Dsonar.projectVersion=1.0 \
+                        -Dsonar.sources=. \
+                        -Dsonar.exclusions=node_modules/**,.git/**
+                    '''
+                }
+            }
+        }
+
         stage('Zip Source Code') {
             steps {
                 sh '''
@@ -41,7 +57,7 @@ pipeline {
 ssh ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
 set -e
 
-# 🔑 LOAD NVM (FIX)
+# 🔑 LOAD NVM
 export NVM_DIR="${NVM_DIR}"
 [ -s "\$NVM_DIR/nvm.sh" ] && . "\$NVM_DIR/nvm.sh"
 
