@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         REMOTE_USER = "murali"
-        REMOTE_HOST = "192.168.1.118"
+        REMOTE_HOST = "192.168.1.119"
         APP_NAME    = "hello-node-jenkins"
         DEPLOY_DIR  = "/home/murali/deployments/${APP_NAME}"
         NVM_DIR     = "/home/murali/.nvm"
